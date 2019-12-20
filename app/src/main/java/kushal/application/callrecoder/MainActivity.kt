@@ -5,22 +5,36 @@ import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.provider.Settings
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import kotlinx.android.synthetic.main.activity_main.*
+import java.io.File
+
 
 class MainActivity : AppCompatActivity() {
+
+    val player by lazy {
+        MediaPlayer()
+    }
 
     val perms = arrayOf(
         Manifest.permission.READ_PHONE_STATE,
         Manifest.permission.READ_EXTERNAL_STORAGE,
         Manifest.permission.WRITE_EXTERNAL_STORAGE,
         Manifest.permission.PROCESS_OUTGOING_CALLS,
-        Manifest.permission.RECORD_AUDIO)
+        Manifest.permission.RECORD_AUDIO
+    )
+
+    private var list = arrayListOf<String>()
+    private var listPaths = arrayListOf<File>()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,8 +43,65 @@ class MainActivity : AppCompatActivity() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(perms, 101)
+            if (checkSelfPermission(perms[0]) == PackageManager.PERMISSION_GRANTED) {
+
+                var root =
+                    File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath)
+
+                lisDir(root)
+
+                swipe.setOnRefreshListener {
+                    swipe.isRefreshing = false
+
+                    root =
+                        File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath)
+
+                    lisDir(root)
+                }
+
+
+                listView.setOnItemClickListener { adapterView, view, pos, l ->
+                    playAudio(listPaths[pos].path)
+                }
+            }
         }
 
+
+    }
+
+    private fun playAudio(path: String) {
+
+        try {
+            player.setDataSource(path)
+            player.prepare()
+        } catch (e: IllegalArgumentException) {
+            e.printStackTrace()
+        } catch (e: Exception) {
+            println("Exception of type : $e")
+            e.printStackTrace()
+        }
+
+        player.start()
+
+        Toast.makeText(this, "playing", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun lisDir(root: File) {
+
+        val files = root.listFiles()
+        list.clear()
+        if (files == null) {
+            return
+        }
+        for (file: File in files) {
+            if (file.name.contains("recorder.3gp")) {
+                list.add(file.name)
+                listPaths.add(file)
+            }
+        }
+
+        val directoryList = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, list)
+        listView.adapter = directoryList
 
     }
 
@@ -77,6 +148,16 @@ class MainActivity : AppCompatActivity() {
             }
             .setCancelable(false)
             .create().show()
+    }
+
+    override fun onPause() {
+        player.stop()
+        super.onPause()
+    }
+
+    override fun onDestroy() {
+        player.stop()
+        super.onDestroy()
     }
 
 }

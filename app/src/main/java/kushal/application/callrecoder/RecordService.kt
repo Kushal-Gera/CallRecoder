@@ -40,7 +40,7 @@ class RecordService : Service() {
                 file =
                     Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
                 val date = Date()
-                val sdf = "dd-MM-yy-hh-mm-ss"
+                val sdf = "dd-MM-yy--hh:mm:ss"
                 val format = DateFormat.format(sdf, date.time)
 
                 recorder = MediaRecorder()
