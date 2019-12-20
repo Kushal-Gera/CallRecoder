@@ -17,7 +17,6 @@ class RecordService : Service() {
 
     lateinit var file: File
     lateinit var recorder: MediaRecorder
-    val path = "/sdcard/downloads"
     val context = this
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -39,13 +38,13 @@ class RecordService : Service() {
                 file =
                     Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
                 val date = Date()
-                val sdf = "dd-MM-yy--hh:mm:ss"
+                val sdf = "dd-MM-yyyy--hh:mm:ss"
                 val format = DateFormat.format(sdf, date.time)
 
                 recorder = MediaRecorder()
                 recorder.setAudioSource(MediaRecorder.AudioSource.MIC)
                 recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
-                recorder.setOutputFile("${file.absoluteFile}/${format}recorder.3gp")
+                recorder.setOutputFile("${file.absoluteFile}/${format} recorder.3gp")
                 recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
 
 

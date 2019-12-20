@@ -74,16 +74,14 @@ class MainActivity : AppCompatActivity() {
         try {
             player.setDataSource(path)
             player.prepare()
-        } catch (e: IllegalArgumentException) {
-            e.printStackTrace()
+            Toast.makeText(this, "playing", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
-            println("Exception of type : $e")
             e.printStackTrace()
+            Toast.makeText(this, "Error Occurred", Toast.LENGTH_SHORT).show()
         }
 
         player.start()
 
-        Toast.makeText(this, "playing", Toast.LENGTH_SHORT).show()
     }
 
     private fun lisDir(root: File) {
