@@ -15,16 +15,25 @@ import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
 
+    val perms = arrayOf(
+        Manifest.permission.READ_PHONE_STATE,
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        Manifest.permission.PROCESS_OUTGOING_CALLS,
+        Manifest.permission.RECORD_AUDIO)
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE), 101)
+            requestPermissions(perms, 101)
         }
 
+
     }
+
 
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onRequestPermissionsResult(
@@ -35,11 +44,11 @@ class MainActivity : AppCompatActivity() {
         if (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults.isNotEmpty()) {
             //nothing here
         } else {
-            if (shouldShowRequestPermissionRationale(Manifest.permission.READ_PHONE_STATE)) {
+            if (shouldShowRequestPermissionRationale(perms[0])) {
                 //denied
-                requestPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE), 101)
+                requestPermissions(perms, 101)
             } else {
-                if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+                if (checkSelfPermission(perms[0]) == PackageManager.PERMISSION_GRANTED) {
                     //allowed
                     Toast.makeText(this, "permission granted", Toast.LENGTH_SHORT).show()
                     onResume()

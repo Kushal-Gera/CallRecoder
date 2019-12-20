@@ -4,6 +4,11 @@
     package="kushal.application.callrecoder">
 
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
 
     <application
         android:allowBackup="true"
@@ -36,6 +41,9 @@
                 <action android:name="android.intent.action.PHONE_STATE" />
             </intent-filter>
         </receiver>
+
+        <service android:name=".RecordService"/>
+
     </application>
 
 </manifest>

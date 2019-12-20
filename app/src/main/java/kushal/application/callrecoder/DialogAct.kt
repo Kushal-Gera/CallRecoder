@@ -22,6 +22,7 @@ class DialogAct : AppCompatActivity() {
                 //do nothing
             }
             .setNegativeButton("no") { dialogInterface: DialogInterface, i: Int ->
+                dialogInterface.dismiss()
                 this.finish()
             }
             .setCancelable(false)
