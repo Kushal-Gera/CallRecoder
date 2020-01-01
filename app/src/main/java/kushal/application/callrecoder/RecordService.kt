@@ -47,7 +47,7 @@ class RecordService : Service() {
                 recorder = MediaRecorder()
                 recorder?.setAudioSource(MediaRecorder.AudioSource.MIC)
                 recorder?.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-                recorder?.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+                recorder?.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
 
                 recorder?.setOutputFile("${file.absoluteFile}/${format} recorder.mp3")
 
@@ -79,17 +79,11 @@ class RecordService : Service() {
                         Toast.makeText(context, "saved recording", Toast.LENGTH_SHORT).show()
 
                         pref.edit().putBoolean("record", false).apply()
+
+                        onDestroy()
                     }
 
                     isCalling = false
-//                    }
-
-//                        val i = Intent(context, ClearStack::class.java)
-//                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-//                        i.flags =
-//                            Intent.FLAG_ACTIVITY_NO_ANIMATION or Intent.FLAG_ACTIVITY_NO_HISTORY
-//                        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-//                        context.startActivity(i)
 
                 }
 
@@ -103,15 +97,15 @@ class RecordService : Service() {
     private fun stopRecorder() {
 
         try {
-            recorder?.stop()
+            recorder!!.stop()
             is_recording = false
         } catch (e: Exception) {
             e.printStackTrace()
         }
         recorder?.reset()
         recorder?.release()
-
         recorder = null
+
     }
 
     private fun recordStuff() {
@@ -128,6 +122,13 @@ class RecordService : Service() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        stopSelf()
     }
 
 }

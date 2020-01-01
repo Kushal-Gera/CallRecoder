@@ -12,11 +12,13 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
+import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 
@@ -58,19 +60,20 @@ class MainActivity : AppCompatActivity() {
                     lisDir(root)
                 }
 
-
                 listView.setOnItemClickListener { adapterView, view, pos, l ->
+                    Toast.makeText(this, "Playing", Toast.LENGTH_SHORT).show()
                     playAudio(listPaths[pos].path)
                 }
+
 
                 stop.setOnClickListener {
                     if (player!!.isPlaying) {
                         player!!.stop()
                         player!!.reset()
-//                        player!!.release()
                     }
                     stop.visibility = View.GONE
                 }
+
 
 //                val intent = Intent()
 //                val packageName = this.packageName
@@ -91,34 +94,60 @@ class MainActivity : AppCompatActivity() {
 
     private fun playAudio(path: String) {
 
-        if (player == null)
-            player = MediaPlayer()
-
         try {
-            if (player!!.isPlaying) {
-                player!!.stop()
-                player!!.reset()
-            }
-        } catch (e: Exception) {
-            Toast.makeText(this, "Error Occurred by ${e.message}", Toast.LENGTH_SHORT).show()
+            val file = File(path)
+            val mimeType = "audio/*"
+            val fileURI = FileProvider.getUriForFile(
+                applicationContext,
+                applicationContext
+                    .packageName + ".provider", file
+            )
+            val intent = Intent()
+            intent.action = Intent.ACTION_VIEW
+            intent.setDataAndType(fileURI, mimeType)
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            startActivity(intent)
+        } catch (e: java.lang.Exception) {
+            Log.e(
+                "TAG", "FAILED TO PLAY SONG $e"
+            )
         }
 
-        try {
-            player!!.setDataSource(path)
-            player?.setVolume(100f, 100f)
-            player!!.prepareAsync()
+        return
 
-            player!!.setOnPreparedListener {
-                player!!.start()
-                Toast.makeText(this, "playing", Toast.LENGTH_SHORT).show()
-                stop.visibility = View.VISIBLE
-            }
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(this, "Error Occurred by ${e.message}", Toast.LENGTH_SHORT).show()
-        }
-
+//
+//
+//        if (player == null) {
+//            player = MediaPlayer()
+//
+//        }
+//
+//
+//        try {
+//            if (player!!.isPlaying) {
+//                player!!.stop()
+//                player!!.reset()
+//            }
+//        } catch (e: Exception) {
+//            Toast.makeText(this, "Error Occurred by ${e.message}", Toast.LENGTH_SHORT).show()
+//        }
+//
+//        try {
+//            player!!.setDataSource(path)
+//            player!!.setVolume(80f, 80f)
+//            player!!.prepareAsync()
+//
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//            Toast.makeText(this, "Error Occurred by ${e.message}", Toast.LENGTH_SHORT).show()
+//        }
+//
+//        player!!.setOnPreparedListener {
+//            player!!.start()
+//            Toast.makeText(this, "playing", Toast.LENGTH_SHORT).show()
+//            stop.visibility = View.VISIBLE
+//        }
+//
 //        player?.setOnCompletionListener {
 //            Toast.makeText(this, "Done", Toast.LENGTH_SHORT).show()
 //            player?.reset()

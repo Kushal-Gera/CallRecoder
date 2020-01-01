@@ -35,9 +35,8 @@
 
             <ImageView
                 android:layout_width="140dp"
-                android:layout_height="100dp"
+                android:layout_height="80dp"
                 android:layout_gravity="center"
-                android:padding="8dp"
                 android:src="@drawable/round"
                 tools:ignore="ContentDescription" />
 
@@ -49,19 +48,19 @@
                 android:gravity="center"
                 android:text="Do You want to Record this Call?"
                 android:textColor="#000"
-                android:textSize="22sp"
-                tools:ignore="HardcodedText" />
+                android:textSize="22dp"
+                tools:ignore="HardcodedText,SpUsage" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="6dp"
                 android:orientation="horizontal">
 
                 <ImageView
                     android:id="@+id/no1"
                     android:layout_width="60dp"
-                    android:layout_height="60dp"
+                    android:layout_height="50dp"
                     android:layout_weight="1"
                     android:contentDescription="@string/des"
                     android:src="@drawable/ic_clear_black_24dp" />
@@ -69,7 +68,7 @@
                 <ImageView
                     android:id="@+id/yes1"
                     android:layout_width="60dp"
-                    android:layout_height="60dp"
+                    android:layout_height="50dp"
                     android:layout_weight="1"
                     android:contentDescription="@string/des"
                     android:src="@drawable/done" />
@@ -85,7 +84,7 @@
                 <TextView
                     android:id="@+id/no2"
                     android:layout_width="60dp"
-                    android:layout_height="60dp"
+                    android:layout_height="50dp"
                     android:layout_weight="1"
                     android:gravity="center"
                     android:text="@string/no"
@@ -97,7 +96,7 @@
                 <TextView
                     android:id="@+id/yes2"
                     android:layout_width="60dp"
-                    android:layout_height="60dp"
+                    android:layout_height="50dp"
                     android:layout_marginEnd="-10dp"
                     android:layout_weight="1"
                     android:gravity="center"
