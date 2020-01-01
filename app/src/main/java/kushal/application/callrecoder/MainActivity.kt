@@ -1,6 +1,7 @@
 package kushal.application.callrecoder
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
@@ -11,6 +12,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
+import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -21,9 +23,7 @@ import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
-    val player by lazy {
-        MediaPlayer()
-    }
+    var player: MediaPlayer? = null
 
     val perms = arrayOf(
         Manifest.permission.READ_PHONE_STATE,
@@ -37,6 +37,7 @@ class MainActivity : AppCompatActivity() {
     private var listPaths = arrayListOf<File>()
 
 
+    @SuppressLint("BatteryLife")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -52,10 +53,8 @@ class MainActivity : AppCompatActivity() {
 
                 swipe.setOnRefreshListener {
                     swipe.isRefreshing = false
-
                     root =
                         File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath)
-
                     lisDir(root)
                 }
 
@@ -63,24 +62,69 @@ class MainActivity : AppCompatActivity() {
                 listView.setOnItemClickListener { adapterView, view, pos, l ->
                     playAudio(listPaths[pos].path)
                 }
+
+                stop.setOnClickListener {
+                    if (player!!.isPlaying) {
+                        player!!.stop()
+                        player!!.reset()
+//                        player!!.release()
+                    }
+                    stop.visibility = View.GONE
+                }
+
+//                val intent = Intent()
+//                val packageName = this.packageName
+//                val pm =
+//                    this.getSystemService(Context.POWER_SERVICE) as PowerManager
+//
+//                if (!pm.isIgnoringBatteryOptimizations(packageName))
+//                    intent.action = Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS
+//                else {
+//                    intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+//                    intent.data = Uri.parse("package:$packageName")
+//                }
+//                startActivity(intent)
             }
         }
-
 
     }
 
     private fun playAudio(path: String) {
 
+        if (player == null)
+            player = MediaPlayer()
+
         try {
-            player.setDataSource(path)
-            player.prepare()
-            Toast.makeText(this, "playing", Toast.LENGTH_SHORT).show()
+            if (player!!.isPlaying) {
+                player!!.stop()
+                player!!.reset()
+            }
         } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(this, "Error Occurred", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Error Occurred by ${e.message}", Toast.LENGTH_SHORT).show()
         }
 
-        player.start()
+        try {
+            player!!.setDataSource(path)
+            player?.setVolume(100f, 100f)
+            player!!.prepareAsync()
+
+            player!!.setOnPreparedListener {
+                player!!.start()
+                Toast.makeText(this, "playing", Toast.LENGTH_SHORT).show()
+                stop.visibility = View.VISIBLE
+            }
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "Error Occurred by ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+
+//        player?.setOnCompletionListener {
+//            Toast.makeText(this, "Done", Toast.LENGTH_SHORT).show()
+//            player?.reset()
+//            player?.release()
+//            player = null
+//        }
 
     }
 
@@ -92,7 +136,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
         for (file: File in files) {
-            if (file.name.contains("recorder.3gp")) {
+            if (file.name.contains("recorder.mp3")) {
                 list.add(file.name)
                 listPaths.add(file)
             }
@@ -149,13 +193,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onPause() {
-        player.stop()
+        player?.stop()
         super.onPause()
     }
 
     override fun onDestroy() {
-        player.stop()
+        player?.stop()
+        player?.reset()
+        player?.release()
+
+        player = null
         super.onDestroy()
     }
+
 
 }

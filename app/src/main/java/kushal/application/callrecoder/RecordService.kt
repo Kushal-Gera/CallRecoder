@@ -13,11 +13,13 @@ import android.widget.Toast
 import java.io.File
 import java.util.*
 
+
 class RecordService : Service() {
 
     lateinit var file: File
-    lateinit var recorder: MediaRecorder
+    var recorder: MediaRecorder? = null
     val context = this
+    var is_recording = false
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
@@ -36,23 +38,23 @@ class RecordService : Service() {
                 super.onCallStateChanged(state, phoneNumber)
 
                 file =
-                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                    (Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS))
+
                 val date = Date()
                 val sdf = "dd-MM-yyyy--hh:mm:ss"
                 val format = DateFormat.format(sdf, date.time)
 
                 recorder = MediaRecorder()
-                recorder.setAudioSource(MediaRecorder.AudioSource.MIC)
-                recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
-                recorder.setOutputFile("${file.absoluteFile}/${format} recorder.3gp")
-                recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
+                recorder?.setAudioSource(MediaRecorder.AudioSource.MIC)
+                recorder?.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+                recorder?.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
 
+                recorder?.setOutputFile("${file.absoluteFile}/${format} recorder.mp3")
 
                 if (TelephonyManager.CALL_STATE_RINGING == state) {
 
                     val i = Intent(context, DialogAct::class.java)
                     i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-//                    i.putExtra("number",intent!!.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER))
                     context.startActivity(i)
                 }
 
@@ -94,27 +96,35 @@ class RecordService : Service() {
             }
         }, PhoneStateListener.LISTEN_CALL_STATE)
 
-        return super.onStartCommand(intent, flags, startId)
+        return START_STICKY
 
     }
 
     private fun stopRecorder() {
 
         try {
-            recorder.stop()
+            recorder?.stop()
+            is_recording = false
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        recorder.reset()
-        recorder.release()
+        recorder?.reset()
+        recorder?.release()
+
+        recorder = null
     }
 
     private fun recordStuff() {
 
         try {
-            recorder.prepare()
-            recorder.start()
+            if (recorder == null)
+                recorder = MediaRecorder()
 
+            if (!is_recording) {
+                recorder?.prepare()
+                recorder?.start()
+                is_recording = true
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }

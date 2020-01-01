@@ -1,10 +1,13 @@
 package kushal.application.callrecoder
 
-import android.app.AlertDialog
+import android.app.Dialog
 import android.content.Context
-import android.content.DialogInterface
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import kotlinx.android.synthetic.main.dialog.*
 
 class DialogAct : AppCompatActivity() {
 
@@ -14,19 +17,28 @@ class DialogAct : AppCompatActivity() {
         val pref = getSharedPreferences("sharedPref", Context.MODE_PRIVATE)
         pref.edit().putBoolean("record", false).apply()
 
-        AlertDialog.Builder(this, R.style.dialog)
-            .setTitle("Call Recorder")
-            .setMessage("Do you want to record this call ?")
-            .setPositiveButton("yes") { dialogInterface: DialogInterface, i: Int ->
-                pref.edit().putBoolean("record", true).apply()
-                //do nothing
-            }
-            .setNegativeButton("no") { dialogInterface: DialogInterface, i: Int ->
-                dialogInterface.dismiss()
-                this.finish()
-            }
-            .setCancelable(false)
-            .create().show()
+
+        val dialog = Dialog(this)
+        dialog.setContentView(R.layout.dialog)
+        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.show()
+
+        dialog.yes1.setOnClickListener {
+            pref.edit().putBoolean("record", true).apply()
+            dialog.dismiss()
+        }
+        dialog.yes2.setOnClickListener {
+            pref.edit().putBoolean("record", true).apply()
+            dialog.dismiss()
+        }
+        dialog.no1.setOnClickListener {
+            dialog.dismiss()
+            this.finish()
+        }
+        dialog.no2.setOnClickListener {
+            dialog.dismiss()
+            this.finish()
+        }
 
     }
 }
